@@ -2,6 +2,7 @@ export type ShippingCompany = 'jp-post' | 'yamato';
 
 export type TrackingStatus =
   | 'unknown'
+  | 'issue'
   | 'picked'
   | 'delivering'
   | 'absence'

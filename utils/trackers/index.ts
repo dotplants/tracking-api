@@ -1,4 +1,4 @@
-import cleanupId from '../cleanup';
+import { cleanupId } from '../tracking-id';
 import { ShippingCompany, TrackingResult } from '../types';
 
 import * as JPPost from './jp-post';

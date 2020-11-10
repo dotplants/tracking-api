@@ -2,19 +2,42 @@ import { JSDOM } from 'jsdom';
 import Iconv from 'iconv-lite';
 import getData from '../data';
 import { TrackingResult, TrackingStatus } from '../types';
+import { cleanupId, checkDigit } from '../tracking-id';
 
 const labelToStatus = (str: string): TrackingStatus => {
   switch (str) {
     case '荷物受付':
-      return 'picked';
     case '発送':
+    case '荷受け':
+      return 'picked';
     case '作業店通過':
+    case '配達店通過':
+    case '投函予定':
+    case '配達中':
+    case '配達予定':
       return 'delivering';
     case '配達完了':
+    case '投函完了':
       return 'completed';
-    default:
-      return 'unknown';
+    case '調査中':
+    case '返品':
+      return 'issue';
   }
+
+  if (str.includes('持戻')) {
+    return 'absence';
+  }
+  if (str.includes('保管中') || str.includes('依頼受付')) {
+    return 'delivering';
+  }
+  if (str.includes('配達完了')) {
+    return 'completed';
+  }
+  if (str.includes('返品')) {
+    return 'issue';
+  }
+
+  return 'unknown';
 };
 
 export const getTracking = async (code: string): Promise<TrackingResult> => {
@@ -88,6 +111,12 @@ export const getTracking = async (code: string): Promise<TrackingResult> => {
 };
 
 export const validateTrackingID = (code: string): boolean => {
-  // WIP
-  return !!code;
+  code = cleanupId(code);
+
+  return (
+    !!code &&
+    !/([^0-9])/gi.test(code) &&
+    [11, 12].includes(code.length) &&
+    checkDigit(code)
+  );
 };

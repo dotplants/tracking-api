@@ -70,7 +70,7 @@ https://<YOUR_DEPLOY_URL>/api/tracking?code=xxxxxxxxxx
 }
 ```
 
-- `currentStatus.type`, `status.type`: `'unknown' | 'picked' | 'delivering' | 'absence' | 'completed'`
+- `currentStatus.type`, `status.type`: `'unknown' | 'issue' | 'picked' | 'delivering' | 'absence' | 'completed'`
 - 何らかのエラーが発生した場合はオブジェクト内に `error` が入ります
 
 ## デプロイ
@@ -78,3 +78,10 @@ https://<YOUR_DEPLOY_URL>/api/tracking?code=xxxxxxxxxx
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fdotplants%2Ftracking-api&env=CONTACT_INFO&envDescription=user-agent%E3%81%AB%E8%A8%98%E8%BC%89%E3%81%99%E3%82%8B%E9%80%A3%E7%B5%A1%E5%85%88%E3%82%92%E5%85%A5%E5%8A%9B)
 
 - user-agent に記載する連絡先を登録するため、`CONTACT_INFO` env が必要です。
+
+## Contributing
+
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+
+- 新たな配送業者の追加
+- 解析ドキュメントの修正: https://github.com/dotplants/tracking-api/blob/main/docs/development/index.md

@@ -1,6 +1,7 @@
 import { JSDOM } from 'jsdom';
 import getData from '../data';
 import { TrackingResult, TrackingStatus } from '../types';
+import { cleanupId, checkDigit } from '../tracking-id';
 
 const labelToStatus = (str: string): TrackingStatus => {
   switch (str) {
@@ -9,12 +10,29 @@ const labelToStatus = (str: string): TrackingStatus => {
       return 'picked';
     case '中継':
     case '到着':
+    case '通過':
+    case '発送':
+    case '持ち出し中':
+    case '配達希望受付':
+    case '転送':
       return 'delivering';
     case 'お届け先にお届け済み':
+    case '窓口でお渡し':
       return 'completed';
-    default:
-      return 'unknown';
+    case 'ご不在のため持ち戻り':
+      return 'absence';
+    case '調査中':
+      return 'issue';
   }
+
+  if (str.includes('通過') || str.includes('保管') || str.includes('送付')) {
+    return 'delivering';
+  }
+  if (str.includes('返送')) {
+    return 'issue';
+  }
+
+  return 'unknown';
 };
 
 export const getTracking = async (code: string): Promise<TrackingResult> => {
@@ -81,6 +99,12 @@ export const getTracking = async (code: string): Promise<TrackingResult> => {
 };
 
 export const validateTrackingID = (code: string): boolean => {
-  // WIP
-  return !!code;
+  code = cleanupId(code);
+
+  return (
+    !!code &&
+    !/([^0-9])/gi.test(code) &&
+    [11, 12].includes(code.length) &&
+    checkDigit(code)
+  );
 };

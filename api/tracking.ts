@@ -46,6 +46,12 @@ export default async (
     });
   } else {
     try {
+      if (!validateTrackingID(code as string, type as ShippingCompany)) {
+        return res.json({
+          error: 'This code is not valid'
+        });
+      }
+
       const data = await getTracking(code as string, type as ShippingCompany);
       res.json(data);
     } catch (e) {
