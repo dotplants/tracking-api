@@ -71,6 +71,7 @@ https://<YOUR_DEPLOY_URL>/api/tracking?code=xxxxxxxxxx
 ```
 
 - `currentStatus.type`, `status.type`: `'unknown' | 'picked' | 'delivering' | 'absence' | 'completed'`
+- 何らかのエラーが発生した場合はオブジェクト内に `error` が入ります
 
 ## デプロイ
 
