@@ -11,6 +11,13 @@ export default async (
   const {
     query: { code, type }
   } = req;
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
   if (type && !SHIPPING_COMPANIES.includes(type as ShippingCompany)) {
     return res.json({
       error: 'Not found the type'

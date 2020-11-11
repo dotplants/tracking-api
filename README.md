@@ -5,6 +5,8 @@
 
 > Unofficial delivery tracking API in Japan
 
+https://jp-tracking-api.now.sh/
+
 ## 対応している運送会社
 
 - 日本郵便
@@ -15,7 +17,7 @@
 ### 荷物を追跡
 
 ```
-https://<YOUR_DEPLOY_URL>/api/tracking?code=xxxxxxxxxx
+https://jp-tracking-api.now.sh/api/tracking?code=xxxxxxxxxx
 ```
 
 - code<`string`>: 追跡番号

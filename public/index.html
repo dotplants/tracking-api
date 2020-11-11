@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      jp-tracking-api.now.sh: Unofficial delivery tracking API in Japan
+    </title>
+    <link rel="stylesheet" href="https://unpkg.com/ress/dist/ress.min.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/fontawesome.min.css"
+      integrity="sha512-kJ30H6g4NGhWopgdseRb8wTsyllFUYIx3hiUwmGAkgA9B/JbzUBDQVr2VVlWGde6sdBVOG7oU8AL35ORDuMm8g=="
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/solid.min.css"
+      integrity="sha512-SazV6tF6Ko4GxhyIZpKoXiKYndqzh7+cqxl9HDH7DGSpjkCN3QLqTAlhJHJnKxu3/2rfCsltzwFC4CmxZE1hPg=="
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/sanitize-html/1.27.5/sanitize-html.min.js"
+      integrity="sha512-1WdDeZGPykoWawFKD3NGJfZM+4hq2+OxUF8ZJrrqFBNU3J+Q5Tgvn+XwHNt8HaVs1MRFFlAgtOgyJr6/mqN/xw=="
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      *,
+      *:before,
+      *:after {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        background-color: rgb(227, 227, 227);
+      }
+
+      body {
+        padding: 5rem 0;
+        color: #333;
+        font-family: 'Noto Sans JP', sans-serif;
+        font-weight: 300;
+      }
+
+      .container {
+        max-width: 700px;
+        padding: 10px;
+        margin: 0 auto;
+      }
+
+      .header {
+        text-align: center;
+        max-width: 500px;
+        margin: 0 auto;
+      }
+
+      p {
+        margin: 8px 0;
+      }
+
+      input {
+        display: block;
+        border: none;
+        border-bottom: #333 solid 1px;
+        padding: 10px;
+        margin: 15px 0;
+        outline: none;
+        width: 100%;
+      }
+
+      button {
+        display: block;
+        border: none;
+        padding: 10px;
+        margin: 15px 0;
+        outline: none;
+        width: 100%;
+        background-color: #6d8c2a;
+        color: #fff;
+      }
+
+      .current {
+        padding: 10px;
+        margin: 10px;
+        border-bottom: #555 solid 1px;
+      }
+
+      .status {
+        padding: 10px;
+        margin: 10px;
+        border: solid 1px;
+      }
+
+      .status .sub {
+        color: rgb(87, 87, 87);
+      }
+
+      .status h2 {
+        font-size: 1.15rem;
+      }
+
+      i.fas {
+        margin-right: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>jp-tracking-api.now.sh</h1>
+        <p><b>Unofficial delivery tracking API in Japan</b></p>
+        <p>
+          <small>
+            API, Source code:
+            <a href="https://github.com/dotplants/tracking-api" target="_blank">
+              dotplants/tracking-api
+            </a>
+          </small>
+        </p>
+        <p>サポートしている配送業者: 日本郵便, ヤマト</p>
+
+        <input type="text" id="tracking-id" placeholder="追跡番号を入力..." />
+
+        <button onclick="search()">追跡</button>
+      </div>
+      <div id="status" style="display: none">
+        <div class="current">
+          <p>業者: <b id="shipping-company">(不明)</b></p>
+          <h2>
+            <i class="fas fa-question-circle" id="current-icon"></i>
+            <span id="current-status">(不明)</span>
+          </h2>
+        </div>
+
+        <div id="list"></div>
+      </div>
+    </div>
+
+    <script>
+      const statusIcons = {
+        unknown: 'question-circle',
+        issue: 'exclamation-circle',
+        picked: 'truck-loading',
+        delivering: 'truck',
+        absence: 'undo-alt',
+        completed: 'check'
+      };
+
+      const statusColors = {
+        unknown: '#333',
+        issue: '#F2245B',
+        picked: '#3D4C99',
+        delivering: '#3D4C99',
+        absence: '#FFDF40',
+        completed: '#14CC80'
+      };
+
+      const companies = {
+        'jp-post': '日本郵便',
+        yamato: 'ヤマト'
+      };
+
+      window.search = () => {
+        const trackingId = document.getElementById('tracking-id').value;
+        fetch(`/api/tracking?code=${trackingId}`)
+          .then(res => res.json())
+          .then(json => {
+            if (json.error) {
+              return alert(json.error);
+            }
+
+            document.getElementById('shipping-company').innerText =
+              companies[json.type] || '(不明)';
+            document.getElementById(
+              'current-icon'
+            ).className = `fas fa-${sanitizeHtml(
+              statusIcons[json.currentStatus.type || 'unknown']
+            )}`;
+            document.getElementById('current-status').innerText =
+              json.currentStatus.label || '(不明)';
+
+            const list = document.getElementById('list');
+            list.innerHTML = '';
+
+            json.history.forEach(history => {
+              const div = document.createElement('div');
+              div.className = 'status';
+              div.style.borderColor = statusColors[history.status.type];
+              div.innerHTML =
+                `<div class="sub">${sanitizeHtml(history.date)}: ${sanitizeHtml(
+                  history.place
+                )}</div>` +
+                `<h2><i class="fas fa-${sanitizeHtml(
+                  statusIcons[history.status.type || 'unknown']
+                )}"></i>${sanitizeHtml(history.status.label)}</h2>` +
+                `${sanitizeHtml(history.description)}`;
+              list.appendChild(div);
+            });
+
+            document.getElementById('status').style.display = 'block';
+          });
+      };
+    </script>
+  </body>
+</html>
