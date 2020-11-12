@@ -82,9 +82,11 @@ export const getTracking = async (code: string): Promise<TrackingResult> => {
       });
     } else {
       // 郵便番号
-      const postalCode = dom.querySelector('td');
-      history[history.length - 1].place =
-        history[history.length - 1].place + ` 〒${postalCode.innerHTML}`;
+      const postalCode = dom.querySelector('td').innerHTML;
+      if (postalCode.trim()) {
+        history[history.length - 1].place =
+          history[history.length - 1].place + ` 〒${postalCode.innerHTML}`;
+      }
     }
   });
 
