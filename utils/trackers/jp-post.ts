@@ -83,7 +83,7 @@ export const getTracking = async (code: string): Promise<TrackingResult> => {
     } else {
       // 郵便番号
       const postalCode = dom.querySelector('td').innerHTML.trim();
-      if (!postalCode || postalCode !== '&nbsp;') {
+      if (!postalCode && postalCode !== '&nbsp;') {
         history[history.length - 1].place += ` 〒${postalCode}`;
       }
     }
